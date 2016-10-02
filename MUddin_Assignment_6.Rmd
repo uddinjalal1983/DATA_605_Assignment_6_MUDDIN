@@ -1,0 +1,129 @@
+---
+title: "DATA_606_Assignment_6"
+author: "Md Jalal Uddin"
+date: "October 1, 2016"
+output: pdf_document
+---
+                            Problem Set 1 
+(1) When you roll a fair die 3 times, how many possible outcomes are there?
+
+```{r}
+#Soulution: When we roll a fair die 1 time possible outcomes are Six (1,2,3,4,5,6). When we roll the die 3 times the possible outcomes should be (6X6X6)=216
+
+(Possible_Outcome<- 6^3)  
+
+```
+
+
+(2) What is the probability of getting a sum total of 3 when you roll a die two times?
+
+```{r}
+#Solution: If we roll a die two times there are 6X6=36 possible outcomes. In two ways we can get the sum of the two dies equal to 3 which is (1,2) and (2,1). So, the probability of getting a sum of 3 when rolling a die two times = (2/36)= 0.055555556.
+
+```
+
+(3) Assume a room of 25 strangers. What is the probability that two of them have the same birthday? Assume that all birthdays are equally likely and equal to 1/365. What happens to this probability when there are 50 people in the room?
+
+```{r}
+#Solution: I will assume everyone has a unique birthday, and to get the probability of two person have same bithday we will find first that no one has same birthday then  subtract this from 1 to get the probability that at least 2 people share a birthday. 25 people have no same birthday = 365/365) * (364/365)*....*(341/365). And 2 person have same birthday=1-25 people have no same birthday.For 50 people I use similar procedure.
+
+Prob_No_same_bithday_25 <- prod(365:341)/(365^25)
+(Prob_two_same_birthday <- 1 - Prob_No_same_bithday_25)
+
+Prob_No_same_bithday_50 <- prod(365:316)/(365^50)
+
+(Prob_two_same_birthday_50<- 1-Prob_No_same_bithday_50)
+
+```
+
+
+                            #Problem Set 2
+                            
+                            
+```{r}
+library(stringr)
+library(knitr)
+library(dplyr)
+
+```
+
+
+
+```{r}
+
+setwd("C:/Users/sql_ent_svc/Desktop/MSDA Assignment/DATA_605/assign6") #assign file
+#creating a function
+Source_File <- function(d = 1) {
+  
+  filenamemju <- 'assign6.sample.txt' #selecting file from downladed source.
+  
+  S_file  <- file(filenamemju, open = 'r', encoding = 'UTF-8-BOM')
+  
+  lines <- readLines(S_file)
+ 
+  lines <- lines[lines != ''] # removing blank lines from the file
+  
+  # creating an empty dataframe to store words and counts the words
+  words <- data.frame(word = I('a'), count = 0)
+  words <- words[FALSE,]
+  
+  for (line in lines) {
+    
+    word_text <- str_split(line, '[[:space:]]')
+    word_text <- str_replace_all(word_text[[1]], '[^[:alpha:]]', '')
+    word_text <-  word_text[ word_text != '']
+    # removing empty strings from the line
+    
+    n <- d - 1
+    
+    for (i in 1:(length(word_text) - n)) {
+      
+      text <- tolower(word_text[i:(i + n)]) # convering into lower case
+      text <- str_join(text[order(text)], collapse = '.') #deleting the dot
+      
+      # check if in words; increment if true, add otherwise
+      if (text %in% words$word) {
+        words[words$word == text, 'count'] <- words[words$word == text, 'count'] + 1
+      } else {
+        words[nrow(words) + 1,] <- list(text, 1)
+      }
+      
+    }
+  }
+  
+  # finding  probabilities of the counted words
+  words$probability <- round(words$count / sum(words$count), 5)
+  
+  # sorting probabilites in decreasing order. 
+  words <- words[order(words$prob, decreasing = TRUE),]
+  
+  return(words)
+}
+
+```
+
+#counting words with probability for single words
+```{r}
+head(Source_File (1))
+
+```
+
+#counting words with probability for two words
+```{r}
+head(Source_File(2))
+
+```
+
+
+
+
+
+
+
+
+
+                            
+                            
+                            
+                            
+                            
